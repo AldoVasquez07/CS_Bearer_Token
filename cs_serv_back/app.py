@@ -14,21 +14,21 @@ def token_required(f):
     def wrapper(*args, **kwargs):
         token = request.headers.get("Authorization")
         if not token or not token.startswith("Bearer "):
-            return jsonify({"error": "Token is missing or invalid"}), 400
+            return jsonify({"Error": "No hay Token o es invalido"}), 400
         try:
             decoded_token = jwt.decode(token.split()[1], SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token has expired"}), 401
+            return jsonify({"Error": "El Token ha expirado"}), 401
         except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token"}), 401
+            return jsonify({"Error": "El Token es invalido"}), 401
         return f(*args, **kwargs)
     return wrapper
 
 
-@app.route("/secure-data", methods=["GET"])
+@app.route("/data-protected", methods=["GET"])
 @token_required
 def secure_data():
-    return jsonify({"message": "Access granted to secure data"})
+    return jsonify({"Acceso": "Puso acceder con exito al back"})
 
 
 if __name__ == "__main__":
