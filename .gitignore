@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+env/
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Python dependencies
+*.egg-info/
+dist/
+build/
+
+# JWT token secrets (if stored in a file)
+secret.key
+token.json
