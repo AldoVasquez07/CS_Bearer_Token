@@ -28,7 +28,7 @@ def token_required(f):
 @app.route("/data-protected", methods=["GET"])
 @token_required
 def secure_data():
-    return jsonify({"Acceso": "Puso acceder con exito al back"})
+    return jsonify({"Acceso": "Pudo acceder con exito al back"})
 
 
 if __name__ == "__main__":
