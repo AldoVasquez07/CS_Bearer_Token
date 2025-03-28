@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 
 def get_secret_key():
-    with open("../SECRET_KEY", "r") as file:
+    with open("../sec_workspace/SECRET_KEY.txt", "r") as file:
         return file.read().strip()
 
 
