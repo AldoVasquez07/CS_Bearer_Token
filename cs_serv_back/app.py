@@ -1,7 +1,9 @@
 from flask import Flask
-
+import jwt
 
 app = Flask(__name__)
+
+SECRET_KEY = "supersecretkey"
 
 
 def token_required(f):
@@ -20,6 +22,7 @@ def token_required(f):
 
 
 @app.route("/secure-data", methods=["GET"])
+@token_required
 def secure_data():
     return jsonify({"message": "Access granted to secure data"})
 
