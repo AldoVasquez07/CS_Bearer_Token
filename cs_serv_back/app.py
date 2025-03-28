@@ -1,9 +1,13 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 import jwt
+
+from security.secret_key import SecretKeyAuth
+
 
 app = Flask(__name__)
 
-SECRET_KEY = "supersecretkey"
+
+SECRET_KEY = SecretKeyAuth.get_secret_key()
 
 
 def token_required(f):
