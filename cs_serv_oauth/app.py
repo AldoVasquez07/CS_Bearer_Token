@@ -4,9 +4,17 @@ import datetime
 import uuid
 import secrets
 
-SECRET_KEY = secrets.token_hex(32)
 
 app = Flask(__name__)
+
+
+def get_secret_key():
+    with open("../SECRET_KEY", "r") as file:
+        return file.read().strip()
+
+
+SECRET_KEY = get_secret_key()
+
 
 @app.route("/token", methods=["POST"])
 def generate_token():
