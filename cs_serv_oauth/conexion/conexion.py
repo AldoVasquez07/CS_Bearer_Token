@@ -3,7 +3,7 @@ import psycopg2
 
 def leer_configuracion():
     try:
-        with open("../../sec_workspace/BD_ENVIRONMENT.arvl", "r") as f:
+        with open("../sec_workspace/BD_ENVIRONMENT.arvl", "r") as f:
             linea = f.readline().strip()
             datos = linea.split("|")
             if len(datos) != 5:
@@ -20,20 +20,13 @@ def leer_configuracion():
         return None
 
 
-def get_conexion():
-    conn = None
+def obtener_cursor():
     config = leer_configuracion()
-
     if config:
         try:
-            # Conectar a la base de datos
             conn = psycopg2.connect(**config)
-            print("Conexión exitosa")
+            return conn.cursor(), conn
         except Exception as e:
             print(f"Error al conectar a PostgreSQL: {e}")
-    else:
-        print("No se pudo leer la configuración.")
-    
-    return conn
+    return None, None
 
-get_conexion()
