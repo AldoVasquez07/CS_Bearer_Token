@@ -1,12 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Productos</title>
 </head>
 <body>
-    <h1>Bienvenido al Dashboard</h1>
-    <p>Has iniciado sesión correctamente.</p>
-    <a href="{{ url_for('home') }}">Cerrar sesión</a>
+
+    <h1>Gestión de Productos</h1>
+
+    <!-- Formulario para agregar producto -->
+    <h2>Agregar Producto</h2>
+    <form method="POST">
+        <input type="hidden" name="action" value="agregar">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <input type="text" name="descripcion" placeholder="Descripción" required>
+        <input type="number" name="precio" placeholder="Precio" required>
+        <input type="number" name="stock" placeholder="Stock" required>
+        <button type="submit">Agregar</button>
+    </form>
+
+    <hr>
+
+    <!-- Tabla de productos con botones para editar y eliminar -->
+    <h2>Lista de Productos</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.id }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.descripcion }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>
+                <!-- Formulario para editar -->
+                <form method="POST" style="display:inline;">
+                    <input type="hidden" name="action" value="editar">
+                    <input type="hidden" name="id" value="{{ producto.id }}">
+                    <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+                    <input type="text" name="descripcion" value="{{ producto.descripcion }}" required>
+                    <input type="number" name="precio" value="{{ producto.precio }}" required>
+                    <input type="number" name="stock" value="{{ producto.stock }}" required>
+                    <button type="submit">Actualizar</button>
+                </form>
+
+                <!-- Formulario para eliminar -->
+                <form method="POST" style="display:inline;">
+                    <input type="hidden" name="action" value="eliminar">
+                    <input type="hidden" name="id" value="{{ producto.id }}">
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
 </body>
 </html>

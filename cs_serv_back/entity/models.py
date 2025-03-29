@@ -3,22 +3,9 @@ from conexion.conexion import obtener_cursor
 
 class Productos:
     @staticmethod
-    def obtener_cursor():
-        """ Establece la conexión y devuelve un cursor. """
-        from leer_configuracion import leer_configuracion  # Asegúrate de que esta función está en un módulo accesible
-        config = leer_configuracion()
-        if config:
-            try:
-                conn = psycopg2.connect(**config)
-                return conn.cursor(), conn
-            except Exception as e:
-                print(f"Error al conectar a PostgreSQL: {e}")
-        return None, None
-
-    @staticmethod
     def get_producto(id):
         """ Obtiene un producto por ID si su estado es True. """
-        cursor, conn = Productos.obtener_cursor()
+        cursor, conn = obtener_cursor()
         if cursor and conn:
             try:
                 cursor.execute("SELECT * FROM producto WHERE id = %s AND estado = TRUE;", (id,))
@@ -34,7 +21,7 @@ class Productos:
     @staticmethod
     def get_productos():
         """ Obtiene todos los productos con estado True. """
-        cursor, conn = Productos.obtener_cursor()
+        cursor, conn = obtener_cursor()
         if cursor and conn:
             try:
                 cursor.execute("SELECT * FROM producto WHERE estado = TRUE;")
@@ -50,7 +37,7 @@ class Productos:
     @staticmethod
     def delete_producto(id):
         """ Desactiva un producto (cambia estado a False en lugar de eliminarlo). """
-        cursor, conn = Productos.obtener_cursor()
+        cursor, conn = obtener_cursor()
         if cursor and conn:
             try:
                 cursor.execute("UPDATE producto SET estado = FALSE WHERE id = %s;", (id,))
@@ -66,7 +53,7 @@ class Productos:
     @staticmethod
     def insert_producto(nombre, descripcion, precio, stock):
         """ Inserta un nuevo producto con estado True. """
-        cursor, conn = Productos.obtener_cursor()
+        cursor, conn = obtener_cursor()
         if cursor and conn:
             try:
                 cursor.execute("""

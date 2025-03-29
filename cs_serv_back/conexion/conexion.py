@@ -1,32 +1,89 @@
-import psycopg2
+import requests
+from flask import Flask, render_template, request, redirect, jsonify, url_for, session
+
+app = Flask(__name__)
+app.secret_key = "supersecretkey"  # Necesario para manejar sesiones
+
+AUTH_SERVER = "http://127.0.0.1:5000/token"  # Servidor de autenticación
+PRODUCTS_API = "http://127.0.0.1:5001/producto"  # API de productos
 
 
-def leer_configuracion():
-    try:
-        with open("../sec_workspace/BD_ENVIRONMENT.arvl", "r") as f:
-            linea = f.readline().strip()
-            datos = linea.split("|")
-            if len(datos) != 5:
-                raise ValueError("Formato de configuración incorrecto")
-            return {
-                "host": datos[0],
-                "port": datos[1],
-                "dbname": datos[2],
-                "user": datos[3],
-                "password": datos[4]
+class Producto:
+    def __init__(self, id, nombre, descripcion, precio, stock):
+        self.id = id
+        self.nombre = nombre
+        self.descripcion = descripcion
+        self.precio = precio
+        self.stock = stock
+
+
+@app.route("/", methods=["GET", "POST"])
+def home():
+    """ Página de login que obtiene un token de autenticación """
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        response = requests.post(AUTH_SERVER, auth=(username, password))
+
+        if response.status_code == 200:
+            token = response.json().get("token")
+            session["token"] = token  # Guardamos el token en la sesión
+            return redirect(url_for("dashboard"))  # Redirige al dashboard
+        
+        return jsonify({"error": "Credenciales inválidas"}), 401
+
+    return render_template("login.html")
+
+
+@app.route("/dashboard", methods=["GET", "POST"])
+def dashboard():
+    """ Página principal con el CRUD de productos """
+    token = session.get("token")
+    if not token:
+        return redirect(url_for("home"))
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Obtener productos
+    response = requests.get(PRODUCTS_API + "s", headers=headers)
+    productos = []
+    
+    if response.status_code == 200:
+        data = response.json()
+        productos = [Producto(**item) for item in data]  # Convertimos cada dict en un objeto Producto
+
+    # Si se envía un formulario
+    if request.method == "POST":
+        action = request.form.get("action")
+        
+        if action == "agregar":
+            datos = {
+                "nombre": request.form["nombre"],
+                "descripcion": request.form["descripcion"],
+                "precio": request.form["precio"],
+                "stock": request.form["stock"],
             }
-    except Exception as e:
-        print(f"Error al leer el archivo de configuración: {e}")
-        return None
+            requests.post(PRODUCTS_API, json=datos, headers=headers)
+        
+        elif action == "editar":
+            producto_id = request.form["id"]
+            datos = {
+                "nombre": request.form["nombre"],
+                "descripcion": request.form["descripcion"],
+                "precio": request.form["precio"],
+                "stock": request.form["stock"],
+            }
+            requests.put(f"{PRODUCTS_API}/{producto_id}", json=datos, headers=headers)
+
+        elif action == "eliminar":
+            producto_id = request.form["id"]
+            requests.delete(f"{PRODUCTS_API}/{producto_id}", headers=headers)
+
+        return redirect(url_for("dashboard"))
+
+    return render_template("dashboard.html", productos=productos)
 
 
-def obtener_cursor():
-    config = leer_configuracion()
-    if config:
-        try:
-            conn = psycopg2.connect(**config)
-            return conn.cursor(), conn
-        except Exception as e:
-            print(f"Error al conectar a PostgreSQL: {e}")
-    return None, None
-
+if __name__ == '__main__':
+    app.run(port=4000, debug=True)  # Corre en otro puerto diferente al auth

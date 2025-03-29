@@ -3,6 +3,8 @@ import jwt
 
 from security.secret_key import SecretKeyAuth
 from entity.models import Productos
+from functools import wraps
+
 
 app = Flask(__name__)
 
@@ -11,18 +13,20 @@ SECRET_KEY = SecretKeyAuth.get_secret_key()
 
 
 def token_required(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
         token = request.headers.get("Authorization")
         if not token or not token.startswith("Bearer "):
-            return jsonify({"Error": "No hay Token o es invalido"}), 400
+            return jsonify({"Error": "No hay Token o es inválido"}), 400
         try:
-            decoded_token = jwt.decode(token.split()[1], SECRET_KEY, algorithms=["HS256"])
+            jwt.decode(token.split()[1], SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return jsonify({"Error": "El Token ha expirado"}), 401
         except jwt.InvalidTokenError:
-            return jsonify({"Error": "El Token es invalido"}), 401
+            return jsonify({"Error": "El Token es inválido"}), 401
         return f(*args, **kwargs)
     return wrapper
+
 
 
 @app.route("/data-protected", methods=["GET"])
