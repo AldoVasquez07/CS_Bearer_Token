@@ -1,11 +1,8 @@
 import requests
 from flask import Flask, render_template, request, redirect, jsonify, url_for, session
-from security.secret_key import SecretKeyAuth
-
 
 app = Flask(__name__)
-
-SECRET_KEY = SecretKeyAuth.get_secret_key()  # Necesario para manejar sesiones
+app.secret_key = "supersecretkey"  # Necesario para manejar sesiones
 
 AUTH_SERVER = "http://127.0.0.1:5000/token"  # Servidor de autenticación
 PRODUCTS_API = "http://127.0.0.1:5001/producto"  # API de productos
