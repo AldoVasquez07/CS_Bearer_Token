@@ -27,5 +27,6 @@ def generate_token():
     
     return jsonify({'token': token})
 
+
 if __name__ == '__main__':
     app.run(port=5000)
