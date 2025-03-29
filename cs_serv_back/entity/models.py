@@ -70,3 +70,25 @@ class Productos:
                 cursor.close()
                 conn.close()
         return None
+    
+    @staticmethod
+    def update_producto(id, nombre, descripcion, precio, stock):
+        """ Actualiza los datos de un producto con estado True. """
+        cursor, conn = obtener_cursor()
+        if cursor and conn:
+            try:
+                cursor.execute("""
+                    UPDATE producto
+                    SET nombre = %s, descripcion = %s, precio = %s, stock = %s
+                    WHERE id = %s AND estado = TRUE;
+                """, (nombre, descripcion, precio, stock, id))
+                conn.commit()
+                return cursor.rowcount > 0
+            except Exception as e:
+                print(f"Error al actualizar el producto: {e}")
+            finally:
+                cursor.close()
+                conn.close()
+        return False
+
+

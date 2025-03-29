@@ -34,6 +34,7 @@ def token_required(f):
 def secure_data():
     return jsonify({"Acceso": "Pudo acceder con exito al back"})
 
+
 @app.route("/productos", methods=["GET"])
 @token_required
 def obtener_productos():
@@ -74,6 +75,21 @@ def agregar_producto():
     if nuevo_id:
         return jsonify({"Mensaje": "Producto agregado con éxito", "id": nuevo_id})
     return jsonify({"Error": "No se pudo agregar el producto"}), 500
+
+
+@app.route("/producto/<int:id>", methods=["PUT"])
+@token_required
+def actualizar_producto(id):
+    """ Actualiza un producto si está activo. """
+    datos = request.get_json()
+    if not all(k in datos for k in ["nombre", "descripcion", "precio", "stock"]):
+        return jsonify({"Error": "Faltan datos"}), 400
+
+    resultado = Productos.update_producto(id, datos["nombre"], datos["descripcion"], datos["precio"], datos["stock"])
+    if resultado:
+        return jsonify({"Mensaje": "Producto actualizado correctamente"})
+    return jsonify({"Error": "No se pudo actualizar el producto"}), 500
+
 
 
 if __name__ == "__main__":
